@@ -2,6 +2,8 @@ import { Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as apigateway from "aws-cdk-lib/aws-apigateway";
+import { HitCounter } from './hitcounter';
+
 
 export class CdkWorkshopStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -18,5 +20,17 @@ export class CdkWorkshopStack extends Stack {
     new apigateway.LambdaRestApi(this, 'LambdaProxy', {
       handler: myfunc
     });
+
+    const hitcounter = new HitCounter(
+      this, 
+      'HelloHitCounter', {
+          downstream: myfunc
+      }
+  );
+                        
+  new apigateway.LambdaRestApi(this, 'Endpoint', {
+      handler: hitcounter.handler
+  });
+
   }
 }
